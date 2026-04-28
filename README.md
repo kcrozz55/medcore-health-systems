@@ -196,5 +196,54 @@
 > | [security-policies-procedures](https://github.com/kcrozz55/security-policies-procedures) | Enterprise policy library for MedCore |
 >
 > ---
->
+
+---
+
+## Architecture Diagrams
+
+The following diagrams document the MedCore EHRP system architecture, network topology, data flows, authorization boundary, and risk management framework. All diagrams were produced using architecturediagram.ai.
+
+---
+
+### Diagram 1 — System Architecture Overview
+
+This diagram presents the full MedCore EHRP system architecture across three tiers: the Client Tier (Web Portal and Mobile Application), the Cloud Infrastructure (API Gateway, Core Services, Data Layer, and Message Broker), and the On-Premises/Edge layer (Legacy HL7 Interface Engine, Local Gateway, and Lab Equipment). It shows how clinicians, staff, and patients interact with the system via HTTPS/REST, and how data flows between the cloud and on-prem environments through a secure tunnel.
+
+![System Architecture Overview](diagrams/system-architecture-overview.png)
+
+---
+
+### Diagram 2 — Network Topology Diagram
+
+This diagram illustrates the segmented network architecture of the MedCore EHRP across six security zones: PUBLIC_ZONE, DMZ_ZONE (Firewall, WAF, Load Balancer), APP_ZONE (Web Servers, Core API, Auth Service), DATA_ZONE (Primary EHR Database, Redis Cache), INTEGRATION_ZONE (HL7 Integration Engine, HIE Gateway), and MGMT_ZONE (SIEM & Logging, Admin Bastion Host). Each zone is separated by dedicated firewalls enforcing least-privilege traffic rules.
+
+![Network Topology Diagram](diagrams/network-topology-diagram.png)
+
+---
+
+### Diagram 3 — Data Flow Diagram (PHI/PII)
+
+This diagram traces the movement of Protected Health Information (PHI) and Personally Identifiable Information (PII) from point of entry through the system to secure storage. Patient and Provider inputs travel via HTTPS POST through an API Gateway (TLS 1.3), where they are validated by an Auth Service (OAuth2/OIDC). Data is passed to a Data Ingestion Service (Node.js), which retrieves encryption keys from AWS KMS/HSM, encrypts the data using AES-256, and writes the ciphertext to the Clinical Database (PostgreSQL) with asynchronous logging to an immutable Audit Store.
+
+![Data Flow Diagram](diagrams/data-flow-diagram.png)
+
+---
+
+### Diagram 4 — Authorization Boundary Diagram
+
+This diagram defines the official ATO boundary for the MedCore EHRP. Within the boundary: the API Gateway (TLS Termination), Auth Service (OAuth2/OIDC), Application Layer (Patient Record Service, Clinical Logic Engine), and Data Layer (Primary Database, Audit Logs — Immutable Store). External to the boundary: Client Tier (User Browser, Admin Portal), Identity Provider, and Health Information Exchange. All internal-to-external communications use HTTPS/REST and HL7/FHIR protocols.
+
+![Authorization Boundary Diagram](diagrams/authorization-boundary-diagram.png)
+
+---
+
+### Diagram 5 — NIST RMF Process Flow
+
+This diagram maps the complete NIST Risk Management Framework lifecycle applied to the MedCore EHRP. Step 0 (Prepare) establishes organizational context. The RMF Core Cycle proceeds through Step 1 (Categorize — using FIPS 199/SP 800-60), Step 2 (Select — SP 800-53 Baseline), Step 3 (Implement — producing the System Security Plan), Step 4 (Assess Control Effectiveness — producing the Security Assessment Report), Step 5 (Authorize System Operation — issuing the Authority to Operate), and Step 6 (Monitor — Continuous Monitoring). The Artifacts layer shows the three primary outputs: SSP, SAR, and POA&M.
+
+![NIST RMF Process Flow](diagrams/nist-rmf-process-flow.png)
+
+---
+
+*All diagrams are version-controlled in this repository and updated as the system evolves.*
 > *MedCore Health Systems is entirely fictional. Created for cybersecurity portfolio and professional demonstration purposes only.*
